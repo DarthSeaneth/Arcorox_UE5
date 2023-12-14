@@ -343,7 +343,7 @@ void AArcoroxCharacter::FireButtonReleased()
 void AArcoroxCharacter::AimButtonPressed()
 {
 	bAimButtonPressed = true;
-	if (CombatState != ECombatState::ECS_Reloading && CombatState != ECombatState::ECS_Equipping) Aim();
+	if (CombatState != ECombatState::ECS_Reloading && CombatState != ECombatState::ECS_Equipping && CombatState != ECombatState::ECS_Stunned) Aim();
 }
 
 void AArcoroxCharacter::AimButtonReleased()
@@ -770,6 +770,7 @@ int32 AArcoroxCharacter::GetInterpLocationIndex()
 
 void AArcoroxCharacter::AutoFireReset()
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	CombatState = ECombatState::ECS_Unoccupied;
 	if (EquippedWeapon == nullptr) return;
 	if (WeaponHasAmmo())
@@ -789,6 +790,7 @@ void AArcoroxCharacter::FinishedCrosshairShootTimer()
 
 void AArcoroxCharacter::FinishReloading()
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	CombatState = ECombatState::ECS_Unoccupied;
 	if (bAimButtonPressed) Aim();
 	int32 CarriedAmmo = AmmoMap[EquippedWeapon->GetAmmoType()];
@@ -809,6 +811,7 @@ void AArcoroxCharacter::FinishReloading()
 
 void AArcoroxCharacter::FinishEquipping()
 {
+	if (CombatState == ECombatState::ECS_Stunned) return;
 	CombatState = ECombatState::ECS_Unoccupied;
 	if (bAimButtonPressed) Aim();
 }
@@ -840,6 +843,12 @@ EPhysicalSurface AArcoroxCharacter::GetSurfaceType()
 	World->LineTraceSingleByChannel(HitResult, GetActorLocation(), GetActorLocation() + FVector(0.f, 0.f, -300.f), ECollisionChannel::ECC_Visibility, QueryParams);
 	if (HitResult.PhysMaterial == nullptr) return EPhysicalSurface::SurfaceType_Default;
 	return UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
+}
+
+void AArcoroxCharacter::EndStun()
+{
+	CombatState = ECombatState::ECS_Unoccupied;
+	if (bAimButtonPressed) Aim();
 }
 
 void AArcoroxCharacter::PlayFireSound()

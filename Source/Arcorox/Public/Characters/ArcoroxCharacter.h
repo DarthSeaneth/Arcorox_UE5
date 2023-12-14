@@ -27,6 +27,7 @@ enum class ECombatState : uint8
 	ECS_Firing UMETA(DisplayName = "Firing"),
 	ECS_Reloading UMETA(DisplayName = "Reloading"),
 	ECS_Equipping UMETA(DisplayName = "Equipping"),
+	ECS_Stunned UMETA(DisplayName = "Stunned"),
 
 	ECS_MAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -200,6 +201,10 @@ protected:
 	/* Returns physical surface type of the ground upon every character footstep */
 	UFUNCTION(BlueprintCallable)
 	EPhysicalSurface GetSurfaceType();
+
+	/* Sets the combat state back to unoccupied after being stunned */
+	UFUNCTION(BlueprintCallable)
+	void EndStun();
 
 	/* Enhanced Input */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
